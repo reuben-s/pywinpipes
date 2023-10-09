@@ -14,6 +14,37 @@ from ctypes import (
     byref
 )
 
+# Parameters
+
+# dwOpenMode
+PIPE_ACCESS_DUPLEX   = 0x00000003
+PIPE_ACCESS_INBOUND  = 0x00000001
+PIPE_ACCESS_OUTBOUND = 0x00000002
+
+FILE_FLAG_FIRST_PIPE_INSTANCE = 0x00080000
+FILE_FLAG_WRITE_THROUGH       = 0x80000000
+FILE_FLAG_OVERLAPPED          = 0x40000000
+
+# dwPipeMode
+PIPE_TYPE_BYTE        = 0x00000000
+PIPE_TYPE_MESSAGE     = 0x00000004
+PIPE_READMODE_BYTE    = 0x00000000
+PIPE_READMODE_MESSAGE = 0x00000002
+
+PIPE_WAIT   = 0x00000000
+PIPE_NOWAIT = 0x00000001
+
+PIPE_ACCEPT_REMOTE_CLIENTS = 0x00000000
+PIPE_REJECT_REMOTE_CLIENTS = 0x00000008
+
+# nMaxInstances
+PIPE_UNLIMITED_INSTANCES = 255
+
+# Error codes
+
+INVALID_HANDLE_VALUE = -1
+ERROR_PIPE_CONNECTED = 535
+
 # Windows data type definitions
 
 HANDLE  = c_void_p       # A handle to an object.
@@ -70,7 +101,7 @@ def CreateNamedPipe(
         DWORD(nOutBufferSize), 
         DWORD(nInBufferSize), 
         DWORD(nDefaultTimeOut), 
-        byref(SECURITY_ATTRIBUTES()) # need to implement this properly
+        None
     )
 
 # ConnectNamedPipe()
@@ -131,10 +162,15 @@ def WriteFile(
 cdll.bCloseHandle.argtypes = [ HANDLE ]
 cdll.bCloseHandle.restype  = BOOL
 def CloseHandle(hObject):
-    return cdll.bCloseHandle(HANDLE(hFile))
+    return cdll.bCloseHandle(HANDLE(hObject))
 
 # FlushFileBuffers()
 cdll.bFlushFileBuffers.argtypes = [ HANDLE ]
 cdll.bFlushFileBuffers.restype  = BOOL
 def FlushFileBuffers(hFile):
     return cdll.bFlushFileBuffers(HANDLE(hFile))
+
+# GetLastError()
+cdll.bGetLastError.restype = DWORD
+def GetLastError():
+    return cdll.bGetLastError()

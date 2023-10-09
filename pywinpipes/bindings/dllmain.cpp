@@ -110,4 +110,10 @@ extern "C"
         );
     }
 
+    EXPORT_SYMBOL
+    DWORD bGetLastError()
+    {
+        return GetLastError();
+    }
+
 }
