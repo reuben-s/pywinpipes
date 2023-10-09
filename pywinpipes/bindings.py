@@ -44,16 +44,17 @@ PIPE_UNLIMITED_INSTANCES = 255
 
 INVALID_HANDLE_VALUE = -1
 ERROR_PIPE_CONNECTED = 535
+ERROR_BROKEN_PIPE = 109
 
 # Windows data type definitions
 
 HANDLE  = c_void_p       # A handle to an object.
 DWORD   = c_ulong        # A 32-bit unsigned integer.
-LPDWORD = POINTER(DWORD) # Pointer to a DWORD type.
 LPCWSTR = c_wchar_p      # A pointer to a constant null-terminated string of 16-bit Unicode characters.
 BOOL    = c_bool         # A Boolean variable (should be TRUE or FALSE).
 LPVOID  = c_void_p       # A pointer to any type.
 LPCVOID = c_void_p       # A pointer to a constant of any type.
+LPDWORD = POINTER(DWORD) # Pointer to a DWORD type.
 
 class SECURITY_ATTRIBUTES(Structure):
     _fields_ = [
@@ -132,9 +133,9 @@ def ReadFile(
     ):
     return cdll.bReadFile(
         HANDLE(hFile),
-        LPVOID(lpBuffer),
+        lpBuffer, # unicode buffer passed from calling function so no casting needed.
         DWORD(nNumberOfBytesToRead),
-        LPDWORD(lpNumberOfBytesRead)
+        lpNumberOfBytesRead # Have to pass by ref from the calling function so no casting needed.
     )
 
 # WriteFile()
@@ -153,9 +154,9 @@ def WriteFile(
     ):
     return cdll.bWriteFile(
         HANDLE(hFile),
-        LPCVOID(lpBuffer),
+        lpBuffer, # unicode buffer passed from calling function so no casting needed.
         DWORD(nNumberOfBytesToWrite),
-        LPDWORD(lpNumberOfBytesWritten)
+        lpNumberOfBytesWritten # Have to pass by ref from the calling function so no casting needed.
     )
 
 # CloseHandle()

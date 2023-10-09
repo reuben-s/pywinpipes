@@ -13,7 +13,12 @@ from .bindings import (
     PIPE_READMODE_MESSAGE,
 )
 
-BUFSIZE = 512
+from .settings import BUFSIZE
+
+from .winapi_utils import (
+    ReadFromNamedPipe
+)
+
 PIPE_PREFIX: str = "\\\\.\\pipe\\"
 
 class PipeServer:
@@ -37,7 +42,8 @@ class PipeServer:
 
         self._connected = True if ConnectNamedPipe(self._pipe) else (GetLastError() == ERROR_PIPE_CONNECTED)
         if self._connected:
-            pass
+            message = ReadFromNamedPipe(self._pipe)
+            print(message)
         else:
             # Client could not connect so close pipe
             CloseHandle(self._pipe)
