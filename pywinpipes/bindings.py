@@ -44,7 +44,7 @@ PIPE_UNLIMITED_INSTANCES = 255
 
 INVALID_HANDLE_VALUE = -1
 ERROR_PIPE_CONNECTED = 535
-ERROR_BROKEN_PIPE = 109
+ERROR_BROKEN_PIPE    = 109
 
 # Windows data type definitions
 
@@ -67,7 +67,7 @@ LPSECURITY_ATTRIBUTES = POINTER(SECURITY_ATTRIBUTES)
 
 # Load DLL
 
-libname = Path().absolute() / "pywinpipes/bindings/x64/Debug/bindings.dll"
+libname = Path().absolute() / "pywinpipes/bindings/bindings.dll"
 cdll = CDLL(str(libname))
 
 # Define bindings for C++ functions
