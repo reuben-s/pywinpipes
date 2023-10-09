@@ -16,7 +16,8 @@ from .bindings import (
 from .settings import BUFSIZE
 
 from .winapi_utils import (
-    ReadFromNamedPipe
+    ReadFromNamedPipe,
+    WriteToNamedPipe
 )
 
 PIPE_PREFIX: str = "\\\\.\\pipe\\"
@@ -43,7 +44,8 @@ class PipeServer:
         self._connected = True if ConnectNamedPipe(self._pipe) else (GetLastError() == ERROR_PIPE_CONNECTED)
         if self._connected:
             message = ReadFromNamedPipe(self._pipe)
-            print(message)
+            WriteToNamedPipe(self._pipe, "Hello from the server!")
+
         else:
             # Client could not connect so close pipe
             CloseHandle(self._pipe)

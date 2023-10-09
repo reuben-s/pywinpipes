@@ -1,5 +1,6 @@
 from .bindings import (
     ReadFile,
+    WriteFile,
     DWORD,
     GetLastError,
     ERROR_BROKEN_PIPE
@@ -14,8 +15,22 @@ from ctypes import (
 
 from .settings import BUFSIZE
 
-def WriteToNamedPipe():
-    pass
+def WriteToNamedPipe(pipe, message):
+    unicode_buffer = create_unicode_buffer(BUFSIZE)
+    unicode_buffer.value = message
+    bytes_written = c_ulong(0)
+
+    success = WriteFile(
+        pipe,
+        unicode_buffer,
+        sizeof(unicode_buffer),
+        byref(bytes_written)
+    )
+
+    if (not success) or (sizeof(unicode_buffer) != bytes_written.value):
+        raise Exception(f"WriteFile failed GLE={GetLastError()}")
+
+    return success
 
 def ReadFromNamedPipe(pipe):
     unicode_buffer = create_unicode_buffer(BUFSIZE)
