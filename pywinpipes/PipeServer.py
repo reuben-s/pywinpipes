@@ -9,7 +9,7 @@ from win32pipe import (
 from .bindings import (
     CreateNamedPipe,
     ConnectNamedPipe,
-    ReadFile,
+    DisconnectNamedPipe,
     HANDLE
 )
 
@@ -38,13 +38,10 @@ class PipeServer:
             )
             print(f"Pipe server: Awaiting client connection on {self._pipe_name}")
 
-            self._connected = True if ConnectNamedPipe(self._pipe, None) else False
-            
-            if self._connected:
-                response = ReadFile(
-                    self._pipe,
-                    None
-                )
-                print(response)
+            self._connected = True if ConnectNamedPipe(self._pipe) else False
+
+            DisconnectNamedPipe(self._pipe)
+            print("Closed Pipe")
+
         except Exception as e:
             print(f"Failed to create pipe. Error: {e}")

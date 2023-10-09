@@ -1,26 +1,48 @@
-import pathlib
-import ctypes
+from pathlib import (
+    Path
+)
 
-# Define necessary data types
-HANDLE = ctypes.c_void_p  # HANDLE is a pointer
-DWORD = ctypes.c_ulong    # DWORD is an unsigned 32-bit integer
-LPCWSTR = ctypes.c_wchar_p  # LPCWSTR is a pointer to a constant wide (Unicode) string
-BOOL = ctypes.c_bool
+from ctypes import (
+    c_void_p,
+    c_ulong,
+    POINTER,
+    c_wchar_p,
+    c_bool,
+    c_void_p,
+    CDLL,
+    Structure,
+    byref
+)
 
-# Define the structure for LPSECURITY_ATTRIBUTES
-class SECURITY_ATTRIBUTES(ctypes.Structure):
-    _fields_ = [("nLength", DWORD),
-                ("lpSecurityDescriptor", ctypes.c_void_p),
-                ("bInheritHandle", BOOL)]
+# Windows data type definitions
+
+HANDLE  = c_void_p       # HANDLE is a pointer ((I think I need to implement the handle type properly))
+
+DWORD   = c_ulong        # A 32-bit unsigned integer.
+LPDWORD = POINTER(DWORD) # Pointer to a DWORD type.
+LPCWSTR = c_wchar_p      # A pointer to a constant null-terminated string of 16-bit Unicode characters.
+BOOL    = c_bool         # A Boolean variable (should be TRUE or FALSE).
+LPVOID  = c_void_p       # A pointer to any type.
+
+class SECURITY_ATTRIBUTES(Structure):
+    _fields_ = [
+        ("nLength", DWORD),
+        ("lpSecurityDescriptor", c_void_p),
+        ("bInheritHandle", BOOL)
+    ]
 
 
-libname = pathlib.Path().absolute() / "pywinpipes/bindings/x64/Debug/bindings.dll"
-cdll = ctypes.CDLL(str(libname))
+# Load DLL
 
-# Define the function prototype for bCreateNamedPipe
+libname = Path().absolute() / "pywinpipes/bindings/x64/Debug/bindings.dll"
+cdll = CDLL(str(libname))
+
+
+# Define bindings for C++ functions
+
+# CreateNamedPipe()
 cdll.bCreateNamedPipe.restype = HANDLE
 def CreateNamedPipe(lpName, dwOpenMode, dwPipeMode, nMaxInstances, nOutBufferSize, nInBufferSize, nDefaultTimeOut, lpSecurityAttributes) -> BOOL:
-    # Call bCreateNamedPipe
     return cdll.bCreateNamedPipe(
         LPCWSTR(lpName), 
         DWORD(dwOpenMode), 
@@ -29,33 +51,19 @@ def CreateNamedPipe(lpName, dwOpenMode, dwPipeMode, nMaxInstances, nOutBufferSiz
         DWORD(nOutBufferSize), 
         DWORD(nInBufferSize), 
         DWORD(nDefaultTimeOut), 
-        ctypes.byref(SECURITY_ATTRIBUTES()) # need to implement this properly
+        byref(SECURITY_ATTRIBUTES()) # need to implement this properly
     )
 
-# Define the function prototype for bConnectNamedPipe
+# ConnectNamedPipe()
 cdll.bConnectNamedPipe.restype = BOOL
-def ConnectNamedPipe(hNamedPipe, lpOverlapped):
-    # Call bConnectNamedPipe
+def ConnectNamedPipe(hNamedPipe):
     return cdll.bConnectNamedPipe(
-        HANDLE(hNamedPipe),
-        None # need to implement this properly
-    )
-
-# Define the function prototype for bDisconnectNamedPipe
-cdll.bDisconnectNamedPipe.restype = BOOL
-def DisconnectNamedPipe(hNamedPipe, lpOverlapped):
-    # Call bDisconnectNamedPipe
-    return cdll.bDisconnectNamedPipe(
         HANDLE(hNamedPipe)
     )
 
-# Define the function prototype for bReadFile
-cdll.bReadFile.restype = ctypes.c_wchar_p
-def ReadFile(hNamedPipe, lpOverlapped):
-    # Call bReadFile
-    value = cdll.bReadFile(
-        HANDLE(hNamedPipe),
-        None # need to implement this properly
+# DisconnectNamedPipe()
+cdll.bDisconnectNamedPipe.restype = BOOL
+def DisconnectNamedPipe(hNamedPipe):
+    return cdll.bDisconnectNamedPipe(
+        HANDLE(hNamedPipe)
     )
-
-    return ctypes.wstring_at(value)
