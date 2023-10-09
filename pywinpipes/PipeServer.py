@@ -1,14 +1,16 @@
 from win32pipe import (
-    CreateNamedPipe,
-    ConnectNamedPipe,
     PIPE_ACCESS_DUPLEX,
     PIPE_TYPE_MESSAGE,
     PIPE_WAIT,
     PIPE_UNLIMITED_INSTANCES,
     PIPE_READMODE_MESSAGE,
 )
-from pywintypes import ( 
-    HANDLE 
+
+from .bindings import (
+    CreateNamedPipe,
+    ConnectNamedPipe,
+    ReadFile,
+    HANDLE
 )
 
 PIPE_PREFIX: str = "\\\\.\\pipe\\"
@@ -37,6 +39,12 @@ class PipeServer:
             print(f"Pipe server: Awaiting client connection on {self._pipe_name}")
 
             self._connected = True if ConnectNamedPipe(self._pipe, None) else False
-
+            
+            if self._connected:
+                response = ReadFile(
+                    self._pipe,
+                    None
+                )
+                print(response)
         except Exception as e:
             print(f"Failed to create pipe. Error: {e}")
