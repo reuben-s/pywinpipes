@@ -21,7 +21,7 @@ from .ClientConnection import (
 )
 
 
-PIPE_PREFIX: str = "\\\\.\\pipe\\"
+PIPE_PREFIX = "\\\\.\\pipe\\"
 
 class PipeServer:
     def __init__(
