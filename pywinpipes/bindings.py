@@ -11,7 +11,8 @@ from ctypes import (
     c_void_p,
     CDLL,
     Structure,
-    byref
+    byref,
+    windll
 )
 
 # Parameters
@@ -68,7 +69,7 @@ LPSECURITY_ATTRIBUTES = POINTER(SECURITY_ATTRIBUTES)
 # Load DLL
 
 libname = Path().absolute() / "pywinpipes/bindings/bindings.dll"
-cdll = CDLL(str(libname))
+cdll = windll.LoadLibrary(str(libname))
 
 # Define bindings for C++ functions
 

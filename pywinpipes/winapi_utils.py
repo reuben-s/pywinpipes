@@ -6,6 +6,12 @@ from .bindings import (
     ERROR_BROKEN_PIPE
 )
 
+from.exceptions import (
+    CLIENT_DISCONNECTED,
+    READFILE_FAILED,
+    WRITEFILE_FAILED
+)
+
 from ctypes import (
     create_unicode_buffer,
     sizeof,
@@ -28,7 +34,7 @@ def WriteToNamedPipe(pipe, message):
     )
 
     if (not success) or (sizeof(unicode_buffer) != bytes_written.value):
-        raise Exception(f"WriteFile failed GLE={GetLastError()}")
+        raise WRITEFILE_FAILED(f"WriteFile failed GLE={GetLastError()}")
 
     return success
 
@@ -45,8 +51,8 @@ def ReadFromNamedPipe(pipe):
 
     if (not success) or (bytes_read == 0):
         if GetLastError() == ERROR_BROKEN_PIPE:
-            raise Exception("Client Disconnected")
+            raise CLIENT_DISCONNECTED("Client Disconnected")
         else:
-            raise Exception(f"ReadFile failed GLE={GetLastError()}")
+            raise READFILE_FAILED(f"ReadFile failed GLE={GetLastError()}")
     
     return unicode_buffer.value

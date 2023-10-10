@@ -1,9 +1,12 @@
 # pywinpipes
-Asynchronous Windows named pipes in Python written in pure Python.
+Windows named pipes in pure Python.
 
 ## Implemented
 - Win API C++ Python bindings
+- New pipe message callback
+- Custom exceptions where needed
 
 ## To do
-- Custom exceptions
-- Async functionality (duh!)
+- Fix blocking behaviour from C++ dll
+- Other various callbacks
+- Pipe client wrapper
