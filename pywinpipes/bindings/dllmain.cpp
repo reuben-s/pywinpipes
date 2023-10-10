@@ -1,8 +1,5 @@
 #include "pch.h"
 
-#include <iostream>
-#include <string>
-
 #define EXPORT_SYMBOL __declspec(dllexport)
 
 extern "C" 
