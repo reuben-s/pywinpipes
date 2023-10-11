@@ -11,6 +11,7 @@ Windows named pipes in pure Python.
 - Pipe client wrapper
 
 ## Usage
+Named pipe server
 ```python
 from pywinpipes.server import PipeServer
 
@@ -21,4 +22,9 @@ def new_message(client, message):
 if __name__ == "__main__":
     pipe_sever = PipeServer("TestPipe", # The pipe name is formatted as "\.\pipe\TestPipe"
                             new_message=new_message)
+```
+
+Named pipe client
+```python
+WIP
 ```
