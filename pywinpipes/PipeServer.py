@@ -13,13 +13,10 @@ from .bindings import (
     PIPE_READMODE_MESSAGE,
     ERROR_PIPE_CONNECTED
 )
-
 from .settings import BUFSIZE
+from .ClientConnection import ClientConnection
 
-from .ClientConnection import (
-    ClientConnection
-)
-
+from threading import Thread, Event
 
 PIPE_PREFIX = "\\\\.\\pipe\\"
 
@@ -38,6 +35,7 @@ class PipeServer:
         self._access_mode = access_mode
         self._pipe_mode = pipe_mode
         self._max_clients = max_clients
+        self._connected = False
 
         # event callbacks
         self._new_message = new_message
@@ -45,6 +43,7 @@ class PipeServer:
         # connected clients
         self._clients = []
 
+        # start listening for clients
         self._init_server()
 
     def _init_server(self):
@@ -63,23 +62,26 @@ class PipeServer:
                 raise Exception("CreateNamedPipe failed")  # Handle didn't open so no need to close it
 
             # Attempt to connect to client
-            self._connected = True if ConnectNamedPipe(self._pipe) else (GetLastError() == ERROR_PIPE_CONNECTED)
+            daemon_block = Thread(
+                target=self._wait_for_connection,
+                daemon=True
+            )
+            daemon_block.start()
+
+            # Wait for ConnectNamedPipe to return a value
+            while (not self._connected): continue
 
             # If successfully connected, create new ClientConnection class to manage connection
-            self._clients.append(
-                ClientConnection(
-                    self._pipe,
-                    self._new_message
-                )
-                )
-
-            """
             if self._connected:
-                message = ReadFromNamedPipe(self._pipe)
-                print(f"Message from the client: {message}")
-                WriteToNamedPipe(self._pipe, "Hello from the server!")
-
-            else:
-                # Client could not connect so close pipe
-                CloseHandle(self._pipe)
-            """
+                self._clients.append(
+                    ClientConnection(
+                        self._pipe,
+                        self._new_message
+                    )
+                )
+            
+            self._connected = False
+    
+    def _wait_for_connection(self):
+        print("Waiting for connection ..")
+        self._connected = True if ConnectNamedPipe(self._pipe) else (GetLastError() == ERROR_PIPE_CONNECTED)

@@ -14,6 +14,8 @@ from .exceptions import (
 
 class ClientConnection:
     def __init__(self, pipe, new_message = None):
+        print("New client connnection created")
+
         self._pipe = pipe
         self._new_message = new_message
         
@@ -34,11 +36,11 @@ class ClientConnection:
                 CLIENT_DISCONNECTED, 
                 READFILE_FAILED,
                 ) as e:
-                if isinstance(e, CLIENT_DISCONNECTED):
-                    print("Client disconnected!")
-                    break
-                else:
+                if isinstance(e, READFILE_FAILED):
                     print(f"Warning! ReadFile failed: {e}")
+                else:
+                    print(e)
+                    break
 
     def send_message(self, message):
         return WriteToNamedPipe(self._pipe, message)

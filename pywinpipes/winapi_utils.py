@@ -3,13 +3,15 @@ from .bindings import (
     WriteFile,
     DWORD,
     GetLastError,
-    ERROR_BROKEN_PIPE
+    ERROR_BROKEN_PIPE,
+    ERROR_PIPE_LISTENING
 )
 
-from.exceptions import (
+from .exceptions import (
     CLIENT_DISCONNECTED,
     READFILE_FAILED,
-    WRITEFILE_FAILED
+    WRITEFILE_FAILED,
+    ERROR_PIPE_LISTENING
 )
 
 from ctypes import (
@@ -50,8 +52,11 @@ def ReadFromNamedPipe(pipe):
     )
 
     if (not success) or (bytes_read == 0):
-        if GetLastError() == ERROR_BROKEN_PIPE:
+        err = GetLastError()
+        if err == ERROR_BROKEN_PIPE:
             raise CLIENT_DISCONNECTED("Client Disconnected")
+        elif err == ERROR_PIPE_LISTENING:
+            raise ERROR_PIPE_LISTENING("No process on other end of pipe")
         else:
             raise READFILE_FAILED(f"ReadFile failed GLE={GetLastError()}")
     

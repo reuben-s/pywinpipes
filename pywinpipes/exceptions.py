@@ -8,3 +8,6 @@ class READFILE_FAILED(Exception):
 
 class WRITEFILE_FAILED(Exception):
     pass
+
+class ERROR_PIPE_LISTENING(Exception):
+    pass
