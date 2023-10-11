@@ -2,7 +2,7 @@
 Windows named pipes in pure Python.
 
 ## Implemented
-- Win API C++ Python bindings
+- Win API Python bindings
 - New pipe message callback
 - Custom exceptions where needed
 
@@ -15,12 +15,10 @@ Windows named pipes in pure Python.
 from pywinpipes import PipeServer
 
 def new_message(client, message):
-    print("New message recieved from server!")
-    client.send_message("Message from server")
+    print(f"New message recieved from server! \"{message}\"")
+    client.send_message("Response from server")
 
 if __name__ == "__main__":
-    pipe_sever = PipeServer(
-        "PipeName", # pipe name, can be accessed from other programms via "\\.\pipe\PipeName"
-        new_message=new_message
-        )
+    pipe_sever = PipeServer("TestPipe", # The pipe name is formatted as "\.\pipe\TestPipe"
+                            new_message=new_message)
 ```
