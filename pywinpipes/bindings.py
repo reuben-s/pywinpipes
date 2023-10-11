@@ -1,7 +1,3 @@
-from pathlib import (
-    Path
-)
-
 from ctypes import (
     c_void_p,
     c_ulong,
@@ -9,13 +5,13 @@ from ctypes import (
     c_wchar_p,
     c_bool,
     c_void_p,
-    CDLL,
+    c_char_p,
     Structure,
     byref,
     windll
 )
 
-# Parameters
+# CreateNamedPipe Parameters
 
 # dwOpenMode
 PIPE_ACCESS_DUPLEX   = 0x00000003
@@ -57,6 +53,7 @@ BOOL    = c_bool         # A Boolean variable (should be TRUE or FALSE).
 LPVOID  = c_void_p       # A pointer to any type.
 LPCVOID = c_void_p       # A pointer to a constant of any type.
 LPDWORD = POINTER(DWORD) # Pointer to a DWORD type.
+LPOVERLAPPED = c_void_p
 
 class SECURITY_ATTRIBUTES(Structure):
     _fields_ = [
@@ -67,15 +64,15 @@ class SECURITY_ATTRIBUTES(Structure):
 
 LPSECURITY_ATTRIBUTES = POINTER(SECURITY_ATTRIBUTES)
 
-# Load DLL
+# Load kernel32.dll
 
-libname = Path().absolute() / "pywinpipes/bindings/bindings.dll"
-cdll = windll.LoadLibrary(str(libname))
+kernel32 = windll.LoadLibrary("kernel32.dll")
 
-# Define bindings for C++ functions
+# Define bindings for windows API functions
 
 # CreateNamedPipe()
-cdll.bCreateNamedPipe.argtypes = [
+CreateNamedPipe = kernel32.CreateNamedPipeW
+CreateNamedPipe.argtypes = [
     LPCWSTR,
     DWORD,
     DWORD,
@@ -85,95 +82,83 @@ cdll.bCreateNamedPipe.argtypes = [
     DWORD,
     LPSECURITY_ATTRIBUTES
 ]
-cdll.bCreateNamedPipe.restype  = HANDLE
-def CreateNamedPipe(
-    lpName, 
-    dwOpenMode, 
-    dwPipeMode, 
-    nMaxInstances, 
-    nOutBufferSize, 
-    nInBufferSize, 
-    nDefaultTimeOut, 
-    lpSecurityAttributes
-    ):
-    return cdll.bCreateNamedPipe(
-        LPCWSTR(lpName), 
-        DWORD(dwOpenMode), 
-        DWORD(dwPipeMode), 
-        DWORD(nMaxInstances), 
-        DWORD(nOutBufferSize), 
-        DWORD(nInBufferSize), 
-        DWORD(nDefaultTimeOut), 
+CreateNamedPipe.restype = HANDLE
+
+# DisconnectNamedPipe()
+DisconnectNamedPipe = kernel32.DisconnectNamedPipe
+DisconnectNamedPipe.argtypes = [ HANDLE ]
+DisconnectNamedPipe.restype  = BOOL
+
+# CloseHandle()
+CloseHandle = kernel32.CloseHandle
+CloseHandle.argtypes = [ HANDLE ]
+CloseHandle.restype  = BOOL
+
+# FlushFileBuffers()
+FlushFileBuffers = kernel32.FlushFileBuffers
+kernel32.FlushFileBuffers.argtypes = [ HANDLE ]
+kernel32.FlushFileBuffers.restype  = BOOL
+
+# GetLastError()
+GetLastError = kernel32.GetLastError
+kernel32.GetLastError.restype = DWORD
+
+# All of the following functions are wrapped in a simple function so that lpOverlapped doesn't have to be passed
+
+# ConnectNamedPipe()
+kernel32.ConnectNamedPipe.argtypes = [ 
+    HANDLE, 
+    LPOVERLAPPED 
+]
+kernel32.ConnectNamedPipe.restype  = BOOL
+def ConnectNamedPipe(hNamedPipe):
+    return kernel32.ConnectNamedPipe(
+        hNamedPipe, 
         None
     )
 
-# ConnectNamedPipe()
-cdll.bConnectNamedPipe.argtypes = [ HANDLE ]
-cdll.bConnectNamedPipe.restype  = BOOL
-def ConnectNamedPipe(hNamedPipe):
-    return cdll.bConnectNamedPipe(HANDLE(hNamedPipe))
-
-# DisconnectNamedPipe()
-cdll.bDisconnectNamedPipe.argtypes = [ HANDLE ]
-cdll.bDisconnectNamedPipe.restype  = BOOL
-def DisconnectNamedPipe(hNamedPipe):
-    return cdll.bDisconnectNamedPipe(HANDLE(hNamedPipe))
-
-# ReadFile()
-cdll.bReadFile.argtypes = [
-    HANDLE,
-    LPVOID,
-    DWORD,
-    LPDWORD
-]
-cdll.bReadFile.restype  = BOOL
-def ReadFile(
-    hFile, 
-    lpBuffer, 
-    nNumberOfBytesToRead, 
-    lpNumberOfBytesRead
-    ):
-    return cdll.bReadFile(
-        HANDLE(hFile),
-        lpBuffer, # unicode buffer passed from calling function so no casting needed.
-        DWORD(nNumberOfBytesToRead),
-        lpNumberOfBytesRead # Have to pass by ref from the calling function so no casting needed.
-    )
-
 # WriteFile()
-cdll.bWriteFile.argtypes = [
+kernel32.WriteFile.argtypes = [
     HANDLE,
     LPCVOID,
     DWORD,
-    LPDWORD
+    LPDWORD,
+    LPOVERLAPPED
 ]
-cdll.bWriteFile.restype  = BOOL
+kernel32.WriteFile.restype  = BOOL
 def WriteFile(
     hFile, 
     lpBuffer, 
     nNumberOfBytesToWrite, 
     lpNumberOfBytesWritten
     ):
-    return cdll.bWriteFile(
-        HANDLE(hFile),
-        lpBuffer, # unicode buffer passed from calling function so no casting needed.
-        DWORD(nNumberOfBytesToWrite),
-        lpNumberOfBytesWritten # Have to pass by ref from the calling function so no casting needed.
+    return kernel32.WriteFile(
+        hFile,
+        lpBuffer,
+        nNumberOfBytesToWrite,
+        lpNumberOfBytesWritten,
+        None
     )
 
-# CloseHandle()
-cdll.bCloseHandle.argtypes = [ HANDLE ]
-cdll.bCloseHandle.restype  = BOOL
-def CloseHandle(hObject):
-    return cdll.bCloseHandle(HANDLE(hObject))
-
-# FlushFileBuffers()
-cdll.bFlushFileBuffers.argtypes = [ HANDLE ]
-cdll.bFlushFileBuffers.restype  = BOOL
-def FlushFileBuffers(hFile):
-    return cdll.bFlushFileBuffers(HANDLE(hFile))
-
-# GetLastError()
-cdll.bGetLastError.restype = DWORD
-def GetLastError():
-    return cdll.bGetLastError()
+# ReadFile()
+kernel32.ReadFile.argtypes = [
+    HANDLE,
+    LPVOID,
+    DWORD,
+    LPDWORD,
+    LPOVERLAPPED
+]
+kernel32.ReadFile.restype  = BOOL
+def ReadFile(
+    hFile, 
+    lpBuffer, 
+    nNumberOfBytesToRead, 
+    lpNumberOfBytesRead
+    ):
+    return kernel32.ReadFile(
+        hFile, 
+        lpBuffer, 
+        nNumberOfBytesToRead, 
+        lpNumberOfBytesRead, 
+        None
+    )

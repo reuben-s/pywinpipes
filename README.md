@@ -7,7 +7,6 @@ Windows named pipes in pure Python.
 - Custom exceptions where needed
 
 ## To do
-- Fix blocking behaviour from C++ dll
 - Other various callbacks
 - Pipe client wrapper
 
