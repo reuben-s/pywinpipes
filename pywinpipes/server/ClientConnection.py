@@ -1,12 +1,12 @@
-from .winapi_utils import (
+from winapi_utils import (
     ReadFromNamedPipe,
     WriteToNamedPipe
 )
-from .exceptions import (
+from exceptions import (
     CLIENT_DISCONNECTED,
     READFILE_FAILED
 )
-from .bindings import (
+from bindings import (
     DisconnectNamedPipe,
     CloseHandle,
     FlushFileBuffers
@@ -15,7 +15,7 @@ from .bindings import (
 from threading import Thread
 
 class ClientConnection:
-    def __init__(self, server, pipe, new_message = None):
+    def __init__(self, server, pipe, new_message=None):
         print("New client connnection created")
 
         self._server = server

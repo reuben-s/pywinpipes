@@ -4,10 +4,7 @@ from ctypes import (
     POINTER,
     c_wchar_p,
     c_bool,
-    c_void_p,
-    c_char_p,
     Structure,
-    byref,
     windll
 )
 

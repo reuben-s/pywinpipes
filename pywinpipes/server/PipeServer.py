@@ -1,7 +1,6 @@
-from .bindings import (
+from bindings import (
     CreateNamedPipe,
     ConnectNamedPipe,
-    DisconnectNamedPipe,
     CloseHandle,
     GetLastError,
     HANDLE,
@@ -13,7 +12,7 @@ from .bindings import (
     PIPE_READMODE_MESSAGE,
     ERROR_PIPE_CONNECTED
 )
-from .settings import BUFSIZE
+from settings import BUFSIZE
 from .ClientConnection import ClientConnection
 
 from threading import Thread, Event
@@ -24,12 +23,12 @@ class PipeServer:
     def __init__(
             self, 
             pipe_name, # Pipe name
-            new_message = None,
-            access_mode = PIPE_ACCESS_DUPLEX,       # Read/write access
-            pipe_mode   = PIPE_TYPE_MESSAGE |       # Message type pipe
-                          PIPE_WAIT |               # Message read mode
-                          PIPE_READMODE_MESSAGE,    # Blocking mode
-            max_clients = PIPE_UNLIMITED_INSTANCES, # Max. instances
+            new_message=None,
+            access_mode=PIPE_ACCESS_DUPLEX,       # Read/write access
+            pipe_mode  =PIPE_TYPE_MESSAGE |       # Message type pipe
+                        PIPE_WAIT |               # Message read mode
+                        PIPE_READMODE_MESSAGE,    # Blocking mode
+            max_clients=PIPE_UNLIMITED_INSTANCES, # Max. instances
             ):
         self._pipe_name = PIPE_PREFIX + pipe_name
         self._access_mode = access_mode
@@ -86,7 +85,9 @@ class PipeServer:
                         self._new_message
                     )
                 )
-    
+            else:
+                CloseHandle(self._pipe) # Client couldn't connect so close the pipe handle
+
     def _wait_for_connection(self):
         self._value_returned = False
         print("Waiting for connection ..")
