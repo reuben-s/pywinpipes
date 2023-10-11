@@ -1,5 +1,4 @@
 from pywinpipes import PipeServer
-import time
 
 def new_message(client, message):
     print(f"New message recieved from server! \"{message}\"")
