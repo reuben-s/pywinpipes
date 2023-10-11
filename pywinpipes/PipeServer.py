@@ -36,6 +36,7 @@ class PipeServer:
         self._pipe_mode = pipe_mode
         self._max_clients = max_clients
         self._connected = False
+        self._value_returned = False
 
         # event callbacks
         self._new_message = new_message
@@ -44,7 +45,12 @@ class PipeServer:
         self._clients = []
 
         # start listening for clients
-        self._init_server()
+        try:
+            self._init_server()
+        except Exception as e:
+            for connection in self._clients:
+                connection.end_connection()
+            raise e
 
     def _init_server(self):
         while (True):
@@ -69,19 +75,20 @@ class PipeServer:
             daemon_block.start()
 
             # Wait for ConnectNamedPipe to return a value
-            while (not self._connected): continue
+            while (not self._value_returned): continue
 
             # If successfully connected, create new ClientConnection class to manage connection
             if self._connected:
                 self._clients.append(
                     ClientConnection(
+                        self,
                         self._pipe,
                         self._new_message
                     )
                 )
-            
-            self._connected = False
     
     def _wait_for_connection(self):
+        self._value_returned = False
         print("Waiting for connection ..")
         self._connected = True if ConnectNamedPipe(self._pipe) else (GetLastError() == ERROR_PIPE_CONNECTED)
+        self._value_returned = True

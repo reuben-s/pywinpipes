@@ -1,21 +1,24 @@
-from threading import (
-    Thread
-)
-
 from .winapi_utils import (
     ReadFromNamedPipe,
     WriteToNamedPipe
 )
-
 from .exceptions import (
     CLIENT_DISCONNECTED,
     READFILE_FAILED
 )
+from .bindings import (
+    DisconnectNamedPipe,
+    CloseHandle,
+    FlushFileBuffers
+)
+
+from threading import Thread
 
 class ClientConnection:
-    def __init__(self, pipe, new_message = None):
+    def __init__(self, server, pipe, new_message = None):
         print("New client connnection created")
 
+        self._server = server
         self._pipe = pipe
         self._new_message = new_message
         
@@ -39,8 +42,21 @@ class ClientConnection:
                 if isinstance(e, READFILE_FAILED):
                     print(f"Warning! ReadFile failed: {e}")
                 else:
+                    # some other error, we need to stop listening for messages as the connection is probably dead
                     print(e)
                     break
+        
+        # cleanup dead connection
+        self.end_connection()
+
+    def end_connection(self):
+        FlushFileBuffers(self._pipe)
+        DisconnectNamedPipe(self._pipe)
+        CloseHandle(self._pipe)
+        del self._server._clients[self._server._clients.index(self)]
 
     def send_message(self, message):
         return WriteToNamedPipe(self._pipe, message)
+
+    def is_alive(self):
+        return self._t.is_alive()
