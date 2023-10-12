@@ -57,6 +57,3 @@ class ClientConnection:
 
     def send_message(self, message):
         return WriteToNamedPipe(self._pipe, message)
-
-    def is_alive(self):
-        return self._t.is_alive()
