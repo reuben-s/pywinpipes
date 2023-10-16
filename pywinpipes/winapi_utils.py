@@ -35,7 +35,10 @@ def WriteToNamedPipe(pipe, message):
     )
 
     if (not success) or (sizeof(unicode_buffer) != bytes_written.value):
-        raise WRITEFILE_FAILED(f"WriteFile failed GLE={GetLastError()}")
+        if err == ERROR_BROKEN_PIPE:
+            raise CLIENT_DISCONNECTED("Client Disconnected")
+        else:
+            raise WRITEFILE_FAILED(f"WriteFile failed GLE={GetLastError()}")
 
     return success
 
