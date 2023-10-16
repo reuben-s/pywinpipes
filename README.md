@@ -16,7 +16,7 @@ Named pipe server
 from pywinpipes.server import PipeServer
 
 def new_message(client, message):
-    print(f"New message recieved from server! \"{message}\"")
+    print(f"New message recieved from client! \"{message}\"")
     client.send_message("Response from server")
 
 if __name__ == "__main__":
