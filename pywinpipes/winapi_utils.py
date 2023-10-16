@@ -1,4 +1,4 @@
-from bindings import (
+from .bindings import (
     ReadFile,
     WriteFile,
     DWORD,
@@ -7,7 +7,7 @@ from bindings import (
     ERROR_PIPE_LISTENING
 )
 
-from exceptions import (
+from .exceptions import (
     CLIENT_DISCONNECTED,
     READFILE_FAILED,
     WRITEFILE_FAILED,
@@ -20,7 +20,7 @@ from ctypes import (
     byref
 )
 
-from settings import BUFSIZE
+from .settings import BUFSIZE
 
 def WriteToNamedPipe(pipe, message):
     unicode_buffer = create_unicode_buffer(BUFSIZE)

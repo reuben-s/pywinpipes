@@ -1,4 +1,4 @@
-from pywinpipes.server import PipeServer
+from pywinpipes import PipeServer
 
 def new_message(client, message):
     print(f"New message recieved from server! \"{message}\"")

@@ -1,4 +1,4 @@
-from bindings import (
+from .bindings import (
     CreateNamedPipe,
     ConnectNamedPipe,
     CloseHandle,
@@ -12,10 +12,10 @@ from bindings import (
     PIPE_READMODE_MESSAGE,
     ERROR_PIPE_CONNECTED
 )
-from settings import BUFSIZE
+from .settings import BUFSIZE
 from .ClientConnection import ClientConnection
 
-from threading import Thread, Event
+from threading import Thread
 
 PIPE_PREFIX = "\\\\.\\pipe\\"
 

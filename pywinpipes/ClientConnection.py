@@ -1,12 +1,12 @@
-from winapi_utils import (
+from .winapi_utils import (
     ReadFromNamedPipe,
     WriteToNamedPipe
 )
-from exceptions import (
+from .exceptions import (
     CLIENT_DISCONNECTED,
     READFILE_FAILED
 )
-from bindings import (
+from .bindings import (
     DisconnectNamedPipe,
     CloseHandle,
     FlushFileBuffers
