@@ -4,7 +4,8 @@ from .bindings import (
     DWORD,
     GetLastError,
     ERROR_BROKEN_PIPE,
-    ERROR_PIPE_LISTENING
+    ERROR_PIPE_LISTENING,
+    GetNamedPipeClientProcessId
 )
 
 from .exceptions import (
@@ -63,3 +64,11 @@ def ReadFromNamedPipe(pipe):
             raise READFILE_FAILED(f"ReadFile failed GLE={GetLastError()}")
     
     return unicode_buffer.value
+
+def GetClientPID(pipe):
+    PID = DWORD(0)
+    success = GetNamedPipeClientProcessId(pipe, byref(PID))
+    print(PID, success)
+    if success:
+        return PID.value
+    return False

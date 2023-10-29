@@ -1,6 +1,7 @@
 from .winapi_utils import (
     ReadFromNamedPipe,
-    WriteToNamedPipe
+    WriteToNamedPipe,
+    GetClientPID
 )
 from .exceptions import (
     CLIENT_DISCONNECTED,
@@ -21,7 +22,9 @@ class ClientConnection:
         self._server = server
         self._pipe = pipe
         self._new_message = new_message
-        
+
+        self.pid = GetClientPID(self._pipe)
+
         # Create thread to recieve messages
         self._t = Thread(
             target=self._recieve_messages,

@@ -43,13 +43,13 @@ ERROR_PIPE_LISTENING = 536
 
 # Windows data type definitions
 
-HANDLE  = c_void_p       # A handle to an object.
-DWORD   = c_ulong        # A 32-bit unsigned integer.
-LPCWSTR = c_wchar_p      # A pointer to a constant null-terminated string of 16-bit Unicode characters.
-BOOL    = c_bool         # A Boolean variable (should be TRUE or FALSE).
-LPVOID  = c_void_p       # A pointer to any type.
-LPCVOID = c_void_p       # A pointer to a constant of any type.
-LPDWORD = POINTER(DWORD) # Pointer to a DWORD type.
+HANDLE  = c_void_p          # A handle to an object.
+DWORD   = c_ulong           # A 32-bit unsigned integer.
+LPCWSTR = c_wchar_p         # A pointer to a constant null-terminated string of 16-bit Unicode characters.
+BOOL    = c_bool            # A Boolean variable (should be TRUE or FALSE).
+LPVOID  = c_void_p          # A pointer to any type.
+LPCVOID = c_void_p          # A pointer to a constant of any type.
+LPDWORD = POINTER(DWORD)    # Pointer to a DWORD type.
 LPOVERLAPPED = c_void_p
 
 class SECURITY_ATTRIBUTES(Structure):
@@ -158,4 +158,19 @@ def ReadFile(
         nNumberOfBytesToRead, 
         lpNumberOfBytesRead, 
         None
+    )
+
+# GetNamedPipeClientProcessId()
+kernel32.GetNamedPipeClientProcessId.argtypes = [
+    HANDLE,
+    LPDWORD
+]
+kernel32.GetNamedPipeClientProcessId.restype = BOOL
+def GetNamedPipeClientProcessId(
+    hPipe, 
+    ClientProcessId
+    ):
+    return kernel32.GetNamedPipeClientProcessId(
+        hPipe,
+        ClientProcessId
     )
