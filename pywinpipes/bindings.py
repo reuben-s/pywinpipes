@@ -34,12 +34,22 @@ PIPE_REJECT_REMOTE_CLIENTS = 0x00000008
 # nMaxInstances
 PIPE_UNLIMITED_INSTANCES = 255
 
+# CreateFile Parameters
+
+# dwDesiredAccess
+GENERIC_READ  = 0x80000000
+GENERIC_WRITE = 0x40000000
+
+# dwCreationDisposition
+OPEN_EXISTING = 3
+
 # Error codes
 
 INVALID_HANDLE_VALUE = -1
 ERROR_PIPE_CONNECTED = 535
 ERROR_BROKEN_PIPE    = 109
 ERROR_PIPE_LISTENING = 536
+ERROR_PIPE_BUSY      = 231
 
 # Windows data type definitions
 
@@ -99,6 +109,19 @@ kernel32.FlushFileBuffers.restype  = BOOL
 # GetLastError()
 GetLastError = kernel32.GetLastError
 kernel32.GetLastError.restype = DWORD
+
+# CreateFile()
+CreateFile = kernel32.CreateFileA
+CreateFile.argtypes = [
+    LPCWSTR,
+    DWORD,
+    DWORD,
+    LPSECURITY_ATTRIBUTES,
+    DWORD,
+    DWORD,
+    HANDLE
+]
+CreateFile.restype = HANDLE
 
 # All of the following functions are wrapped in a simple function so that lpOverlapped doesn't have to be passed
 

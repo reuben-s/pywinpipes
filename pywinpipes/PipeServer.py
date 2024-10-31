@@ -37,6 +37,8 @@ class PipeServer:
         self._connected = False
         self._value_returned = False
 
+        self._pipe = None
+
         # event callbacks
         self._new_message = new_message
 

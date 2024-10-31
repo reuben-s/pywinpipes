@@ -23,9 +23,11 @@ from .bindings import (
 )
 
 from .PipeServer import PipeServer
+from .PipeClient import PipeClient
 
 __all__ = (
     "PipeServer"
+    "PipeClient"
     "PIPE_ACCESS_DUPLEX",
     "PIPE_ACCESS_INBOUND",
     "PIPE_ACCESS_OUTBOUND",
